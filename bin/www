@@ -1,0 +1,128 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var bc = require('../luxcoin/app/index');
+var debug = require('debug')('mean-app:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var appport = normalizePort(process.env.PORT || '3000');
+app.set('port', appport);
+
+
+var bcport1 = normalizePort(process.env.PORT || '3002');
+bc.set('port', bcport1);
+
+/**
+ * Create HTTP server.
+ */
+var server = http.createServer(app);
+var bcserver = http.createServer(bc);
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(appport);
+server.on('error', apponError);
+server.on('listening', apponListening);
+
+bcserver.listen(bcport1);
+bcserver.on('error', bconError);
+bcserver.on('listening', bconListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function apponError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof appport === 'string'
+    ? 'Pipe ' + appport
+    : 'Port ' + appport;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+function bconError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof bcport1 === 'string'
+    ? 'Pipe ' + bcport1
+    : 'Port ' + bcport1;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function apponListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.appport;
+  debug('Listening on ' + bind);
+}
+
+function bconListening() {
+  var addr = bcserver.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.bcport1;
+  debug('Listening on ' + bind);
+}
